@@ -41,12 +41,15 @@ Introduces structured message formatting using `SystemMessage` and `HumanMessage
 - Shows how to pass a list of messages (instead of a plain string) to the LLM.
 - Demonstrates prompt engineering within a graph node.
 
-### graph_05.py — Two-Node Pipeline: Classify → Respond
-A multi-node graph that chains two LLM calls together.
+### graph_05.py — Three-Node Pipeline: Classify → Respond → Summarize
+A multi-node graph that chains three LLM calls together, with terminal input.
 
-- **Node 1 (`classify`)**: asks Claude to classify the user's question as `TECHNICAL` or `GENERAL`.
+- **Input**: reads the user's question at runtime via `input()` from the terminal.
+- **Node 1 (`classify`)**: asks Claude to classify the question as `TECHNICAL` or `GENERAL`, with robust parsing (`.strip().upper()` + fallback to `GENERAL`).
 - **Node 2 (`respond`)**: uses the detected category to tailor the response, answering in Portuguese.
-- Illustrates how state flows between nodes and how one node's output can influence the next.
+- **Node 3 (`summarize`)**: condenses the full response into a single summary sentence.
+- State now carries a `summary` field in addition to `category` and `response`.
+- Illustrates multi-step LLM chaining where each node's output feeds the next.
 
 ## Concepts Covered
 
@@ -59,3 +62,5 @@ A multi-node graph that chains two LLM calls together.
 | `SystemMessage` / `HumanMessage` | graph_04 |
 | Multi-node chaining | graph_05 |
 | State passing between nodes | graph_05 |
+| Terminal user input (`input()`) | graph_05 |
+| Three-step LLM pipeline | graph_05 |

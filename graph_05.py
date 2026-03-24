@@ -13,6 +13,7 @@ class State(TypedDict):
     user_input: str
     category: str
     response: str
+    summary: str
 
 def classify(state: State) -> State:
     print("=== NÓ 1: CLASSIFICANDO ===")
@@ -21,7 +22,9 @@ def classify(state: State) -> State:
         HumanMessage(content=state["user_input"])
     ]
     result = llm.invoke(messages)
-    category = result.content.strip()
+    category = result.content.strip().upper()
+    category = "TECHNICAL" if "TECHNICAL" in category else "GENERAL"
+
     print("Categoria detectada:", category)
     return {"category": category}
 
@@ -36,13 +39,29 @@ def respond(state: State) -> State:
     print("Resposta:", result.content)
     return {"response": result.content}
 
+def summarize(state: State) -> State:
+    print("\n=== NÓ 3: SUMARIZANDO ===")
+    print("Resposta:", state["response"])
+    messages = [
+        SystemMessage(content="Summarize the following response in one sentence."),
+        HumanMessage(content=state["response"])
+    ]
+    result = llm.invoke(messages)
+    return {"summary": result.content}
+
 builder = StateGraph(State)
 builder.add_node("classify", classify)
 builder.add_node("respond", respond)
+builder.add_node("summarize", summarize)
 builder.set_entry_point("classify")
 builder.add_edge("classify", "respond")
-builder.add_edge("respond", END)
+builder.add_edge("respond", "summarize")
+builder.add_edge("summarize", END)
 
 graph = builder.compile()
 
-output = graph.invoke({"user_input": "How do I use LangGraph?", "category": "", "response": ""})
+user_input = input("Digite sua pergunta: ")
+output = graph.invoke({"user_input": user_input, "category": "", "response": "", "summary": ""})
+
+print("\n=== RESUMO FINAL ===")
+print(output["summary"])
