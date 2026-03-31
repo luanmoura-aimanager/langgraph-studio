@@ -51,6 +51,22 @@ A multi-node graph that chains three LLM calls together, with terminal input.
 - State now carries a `summary` field in addition to `category` and `response`.
 - Illustrates multi-step LLM chaining where each node's output feeds the next.
 
+### graph_06.py — Persistent Memory Chat
+Introduces `MemorySaver` for per-user conversation history.
+
+- State uses `Annotated[list, add]` so messages accumulate across invocations.
+- At runtime, the user provides a name that becomes the `thread_id`, giving each person their own memory context.
+- The chat node prepends a system prompt and passes the full history to Claude on every turn.
+- Optionally prints the message history before responding.
+
+### graph_07.py — Classify → Chat with Persistent Memory
+Combines message classification with persistent per-user memory.
+
+- **Node 1 (`classify`)**: classifies the user's message as `QUESTION` or `STATEMENT`.
+- **Node 2 (`chat`)**: uses the category to tailor the response, answered in Portuguese.
+- History is displayed **after** the response, on demand.
+- `MemorySaver` with `thread_id` keeps separate conversation history per user.
+
 ## Concepts Covered
 
 | Concept | Introduced in |
@@ -64,3 +80,7 @@ A multi-node graph that chains three LLM calls together, with terminal input.
 | State passing between nodes | graph_05 |
 | Terminal user input (`input()`) | graph_05 |
 | Three-step LLM pipeline | graph_05 |
+| `MemorySaver` / persistent memory | graph_06 |
+| Per-user `thread_id` context | graph_06 |
+| Classify + Chat pipeline with memory | graph_07 |
+| Post-response history display | graph_07 |
