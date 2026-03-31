@@ -17,7 +17,11 @@ class State(TypedDict):
     messages: Annotated[list, add]
 
 def classify(state: State) -> State:
-    messages = [SystemMessage(content="Classify the user question into exactly one word: QUESTION or STATEMENT.")] + state["messages"]
+    last_message = state["messages"][-1].content
+    messages = [
+        SystemMessage(content="Classify the user question into exactly one word: QUESTION or STATEMENT."),
+        HumanMessage(content=last_message)
+    ]
     result = llm.invoke(messages)
     category = result.content.strip().upper()
     category = "QUESTION" if "QUESTION" in category else "STATEMENT"

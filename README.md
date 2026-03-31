@@ -62,7 +62,7 @@ Introduces `MemorySaver` for per-user conversation history.
 ### graph_07.py — Classify → Chat with Persistent Memory
 Combines message classification with persistent per-user memory.
 
-- **Node 1 (`classify`)**: classifies the user's message as `QUESTION` or `STATEMENT`.
+- **Node 1 (`classify`)**: extracts only the last message and classifies it as `QUESTION` or `STATEMENT` (avoids sending full history to the classifier).
 - **Node 2 (`chat`)**: uses the category to tailor the response, answered in Portuguese.
 - History is displayed **after** the response, on demand.
 - `MemorySaver` with `thread_id` keeps separate conversation history per user.
