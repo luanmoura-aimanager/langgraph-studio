@@ -131,6 +131,31 @@ Until now every edge was fixed — node A always went to node B. **Conditional e
 
 ---
 
+### graph_09.py — Custom State Fields + Multi-Thread Memory
+
+**What it teaches:** How to mix message accumulation with other tracked values in state.
+
+- **Custom state field (`turn_count`)**: a plain `int` alongside the message list. Because it has no reducer, each return simply *replaces* the previous value — while `messages` keeps appending.
+- **`state.get("turn_count", 0)`**: safe access pattern for the first turn when a field hasn't been set yet.
+- **Multiple independent threads**: `thread-1` and `thread-3` both run on the same graph but maintain completely separate histories and counters.
+- **`graph.get_state(config)`**: lets you inspect the full saved state of any thread at any time — useful for debugging and auditing.
+
+Key takeaway: every field in state can have its own merge strategy. Messages accumulate; scalars overwrite. You can mix both in the same `TypedDict`.
+
+---
+
+### graph_10.py — Multiple Isolated Personas via Thread IDs
+
+**What it teaches:** How a single compiled graph hosts many independent conversations simultaneously.
+
+- **One graph, many sessions**: `thread-1` is Bob the kitchen chef; `thread-2` is Alex the football expert. The graph code is identical — only `thread_id` differs.
+- **Thread isolation in practice**: the persona set in turn 1 of a thread persists into turn 2 of the *same* thread, but is completely invisible to other threads.
+- **Inspecting per-thread state**: `graph.get_state()` is called for each thread separately, showing that `MemorySaver` keeps histories isolated even within one in-memory store.
+
+This is the pattern behind multi-user chat applications: each user gets their own `thread_id`, and the same graph serves them all.
+
+---
+
 ## Concepts Covered
 
 | Concept | Introduced in |
@@ -154,3 +179,9 @@ Until now every edge was fixed — node A always went to node B. **Conditional e
 | Conditional edges (branching) | graph_08 |
 | Router functions | graph_08 |
 | Multiple response paths in one graph | graph_08 |
+| Custom state fields (non-message) | graph_09 |
+| Overwrite vs. accumulate reducers | graph_09 |
+| Multi-thread memory isolation | graph_09 |
+| `graph.get_state()` inspection | graph_09 |
+| One graph, multiple personas | graph_10 |
+| Thread-scoped conversation history | graph_10 |
